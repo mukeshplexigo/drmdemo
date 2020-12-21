@@ -1,25 +1,29 @@
-//
-//  ViewController.swift
-//  drmdemo
-//
-//  Created by abc on 17/12/20.
-//
+/**
+ * ViewController.swift
+ *
+ * This software is the confidential and proprietary product of
+ * Nagravision S.A., OpenTV, Inc. or its affiliates,
+ * the use of which is governed by
+ * (i)  the terms and conditions of the agreement you accepted by
+ *      clicking that you agree or
+ * (ii) such other agreement entered into between you and
+ *      Nagravision S.A., OpenTV, Inc. or their affiliates.
+ */
 
 import UIKit
 import OPYSDKFPSTv
 import AVFoundation
 
 class PlayerView: UIView {
-
   var player: AVPlayer? {
     get { return playerLayer.player }
     set { playerLayer.player = newValue }
   }
-
+  
   var playerLayer: AVPlayerLayer {
     return layer as! AVPlayerLayer
   }
-
+  
   override class var layerClass: AnyClass {
     return AVPlayerLayer.self
   }
@@ -27,40 +31,75 @@ class PlayerView: UIView {
 
 class ViewController: UIViewController {
 
-  let otvPlayer: OTVAVPlayer
+  var otvPlayer: OTVAVPlayer?
+
+  let defaultLicenseDelegate: OTVDefaultLicenseDelegate?
 
   @IBOutlet weak var playerView: PlayerView!
-
-//  let assetURL = URL(string:
-//    "https://d3bqrzf9w11pn3.cloudfront.net/basic_hls_bbb_clear/index.m3u8")!
-
+    
+  let assetURL = URL(string:
+    "https://d3bqrzf9w11pn3.cloudfront.net/basic_hls_bbb_encrypted/index.m3u8")!
+    
+//
 //    let assetURL = URL(string:
-//    "https://d3oa3c8etfmj1l.cloudfront.net/Content/Movies/MV_Punyakoti_Sanskrit_MIDNA/Trailer/Trl_Punyakoti_Sanskrit.m3u8?Expires=1603383076&Signature=l8bgT3tFfplNG79FAMhCuM11rxkYgLvozwvO4xEFr7hAMgmHuaRkOY-jSPLiCHDcYJKgpY2auJ~hXMPE289F8Dtd2OSOokpkyRZRQUArgl1WencSVsFbd06PjZ12yX1MkH76Hvw12QrRBtomqEqZCmKCsrjj-3DX6U5-zGuT91S5WXtsqCkVCFl2RlWoA0OFfQTJKpmz4dAHIAxOG7BDfOiVs8Q4B7kAMcYulmKVUu4yQXUW-nfEXaFs70FLi6CQ2QgZbUL9tDCpWbvImd1wdfKBNm8494FEDac5EqU3mRgk4u1CDX79vm0w9nUDBh37mWJ~A60O-7QHVLY942-YuQ__&Key-Pair-Id=APKAJ33H2SGDXVDF2HLQ")!
+//      "https://plexigo-nagra-test.s3-eu-west-1.amazonaws.com/Published/trl_airstrike_fps_withiv_test3/Trl_AirStrike_English.m3u8")!
 
     
-      let assetURL = URL(string:
-        "https://nam06.safelinks.protection.outlook.com/?url=https%3A%2F%2Faka.ms%2FAlWakrahLive&data=04%7C01%7CMourad.Idrissi%40microsoft.com%7C7df0d5c71c724be4d14908d8854d0258%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C637405913110621559%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&sdata=3JvnpsWq2NCx8OyNKaMHoXX2vCX2DIIWWk%2Fub%2FfYnsg%3D&reserved=0")!
 
+    
+  // Hardcoded URL to the SSP
+  let sspCertificateURL = URL(string:"https://vsd02fy1.anycast.nagra.com/VSD02FY1/fpls/contentlicenseservice/v1/certificates")!
+
+//    let sspCertificateURL = URL(string:"https://ufo2b7je.anycast.nagra.com/UFO2B7JE/fpls/contentlicenseservice/v1/certificates/UFO2B7JE")!
+
+    
+  // Hardcode URL to the licence server
+  let licenseURL = URL(string: "https://vsd02fy1.anycast.nagra.com/VSD02FY1/fpls/contentlicenseservice/v1/licenses")!
+
+//    let licenseURL = URL(string: "https://ufo2b7je.anycast.nagra.com/UFO2B7JE/fpls/contentlicenseservice/v1/licenses")!
+
+  // The SSP Token linked with the assetURL
+  let sspToken = "eyJraWQiOiI4MTI0MjUiLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJDb250ZW50QXV0aFoiLCJjb250ZW50UmlnaHRzIjpbeyJkZWZhdWx0S2NJZHMiOlsiZDhkNzBmYmQtMmNkMi00OTcxLWI4MGMtNjYxNzIwMTE3NjViIl0sImNvbnRlbnRJZCI6ImU4YmJmNzQ4LWE0ZDgtNDc5MS1hNDcwLTEzOTlmZWE5MTQ2MCIsInN0b3JhYmxlIjp0cnVlLCJkZWZhdWx0VXNhZ2VSdWxlcyI6eyJtaW5MZXZlbCI6MCwid2F0ZXJtYXJraW5nRW5hYmxlZCI6dHJ1ZSwiaW1hZ2VDb25zdHJhaW50IjpmYWxzZSwiaGRjcFR5cGUiOiJUWVBFXzAiLCJ1bmNvbXByZXNzZWREaWdpdGFsQ2FwcGluZ1Jlc29sdXRpb24iOiJOT19SRVNUUklDVElPTlMiLCJ1bnByb3RlY3RlZEFuYWxvZ091dHB1dCI6dHJ1ZSwiYW5hbG9nQ2FwcGluZ1Jlc29sdXRpb24iOiJOT19SRVNUUklDVElPTlMiLCJoZGNwIjp0cnVlLCJkZXZpY2VDYXBwaW5nUmVzb2x1dGlvbiI6Ik5PX1JFU1RSSUNUSU9OUyIsImRpZ2l0YWxPbmx5IjpmYWxzZSwidW5wcm90ZWN0ZWREaWdpdGFsT3V0cHV0Ijp0cnVlfX1dfQ.X7kslNaBkbccfGboIDwMJ-ZXpsBUjtpxV6G575D_TkE"
+  
+//    let sspToken = "eyJraWQiOiI4MTUxOTgiLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJDb250ZW50QXV0aFoiLCJjb250ZW50UmlnaHRzIjpbeyJjb250ZW50SWQiOiJzaW1wbGVobHN0ZXN0MyIsInVzYWdlUnVsZXNQcm9maWxlSWQiOiJUZXN0In1dfQ.XWCLc3pgPpvkA6BDqRJxLK1cmUigd5pHDitybeRdJe8"
+
+    var isPlaying = true
+    
   required init?(coder aDecoder: NSCoder) {
-
+    
+    // Ensure that the licence delegate has been initialised and the SSP Certificate
+    // has been downloaded before attempting to play the encrypted stream
+    defaultLicenseDelegate = OTVDefaultLicenseDelegate(certificateURL: sspCertificateURL, licenseURL: licenseURL)
+    
     // Ensure SDK has been loaded before constructing the player.
     // Note `load()` will load the file `opy_licence` if it's included in the project
     // If the licence token is stored under a different file name then string token must be
     // loaded in manually and passed in directly to `OTVSDK.load()`.
     // It may be more suitable to call `load()` in the `AppDelegate` depending on use case.
     OTVSDK.load()
-
-    // initialise the player by passing in the asset url.
-    otvPlayer = OTVAVPlayer(url: assetURL)
-
+    OTVSDK.setLogging(level: .debug)
+    
     super.init(coder: aDecoder)
-  }
+    
+    // Pass the sspLicenseDelegate to the SDK to enable encrypted playback
+    OTVDRMManager.shared.setLicenseDelegate(defaultLicenseDelegate!)
 
+    // Use the SSP token to generate the SSP custom data header
+    defaultLicenseDelegate?.setHTTPHeader(parameters: ["nv-authorizations": sspToken])
+
+    // Now that the SSP encrypted playback has been initialised we can construct the player
+    otvPlayer = OTVAVPlayer(url: assetURL)
+  }
+  
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-
+    
     //assign player to playerView
     playerView.player = otvPlayer
-    otvPlayer.play()
+    otvPlayer?.play()
+    self.otvPlayer?.isMuted = false
+    playerView.player?.isMuted = false
+    isPlaying = true
   }
+    
 }
