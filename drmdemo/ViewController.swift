@@ -37,33 +37,34 @@ class ViewController: UIViewController {
 
   @IBOutlet weak var playerView: PlayerView!
     
+
   let assetURL = URL(string:
     "https://d3bqrzf9w11pn3.cloudfront.net/basic_hls_bbb_encrypted/index.m3u8")!
     
-//
+//    UFO Sample assetURL
 //    let assetURL = URL(string:
 //      "https://plexigo-nagra-test.s3-eu-west-1.amazonaws.com/Published/trl_airstrike_fps_withiv_test3/Trl_AirStrike_English.m3u8")!
 
     
 
-    
-  // Hardcoded URL to the SSP
+// Hardcoded URL to the SSP
   let sspCertificateURL = URL(string:"https://vsd02fy1.anycast.nagra.com/VSD02FY1/fpls/contentlicenseservice/v1/certificates")!
 
+//    UFO Sample sspCertificateURL
 //    let sspCertificateURL = URL(string:"https://ufo2b7je.anycast.nagra.com/UFO2B7JE/fpls/contentlicenseservice/v1/certificates/UFO2B7JE")!
 
     
   // Hardcode URL to the licence server
   let licenseURL = URL(string: "https://vsd02fy1.anycast.nagra.com/VSD02FY1/fpls/contentlicenseservice/v1/licenses")!
 
+//    UFO Sample licenseURL
 //    let licenseURL = URL(string: "https://ufo2b7je.anycast.nagra.com/UFO2B7JE/fpls/contentlicenseservice/v1/licenses")!
 
   // The SSP Token linked with the assetURL
   let sspToken = "eyJraWQiOiI4MTI0MjUiLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJDb250ZW50QXV0aFoiLCJjb250ZW50UmlnaHRzIjpbeyJkZWZhdWx0S2NJZHMiOlsiZDhkNzBmYmQtMmNkMi00OTcxLWI4MGMtNjYxNzIwMTE3NjViIl0sImNvbnRlbnRJZCI6ImU4YmJmNzQ4LWE0ZDgtNDc5MS1hNDcwLTEzOTlmZWE5MTQ2MCIsInN0b3JhYmxlIjp0cnVlLCJkZWZhdWx0VXNhZ2VSdWxlcyI6eyJtaW5MZXZlbCI6MCwid2F0ZXJtYXJraW5nRW5hYmxlZCI6dHJ1ZSwiaW1hZ2VDb25zdHJhaW50IjpmYWxzZSwiaGRjcFR5cGUiOiJUWVBFXzAiLCJ1bmNvbXByZXNzZWREaWdpdGFsQ2FwcGluZ1Jlc29sdXRpb24iOiJOT19SRVNUUklDVElPTlMiLCJ1bnByb3RlY3RlZEFuYWxvZ091dHB1dCI6dHJ1ZSwiYW5hbG9nQ2FwcGluZ1Jlc29sdXRpb24iOiJOT19SRVNUUklDVElPTlMiLCJoZGNwIjp0cnVlLCJkZXZpY2VDYXBwaW5nUmVzb2x1dGlvbiI6Ik5PX1JFU1RSSUNUSU9OUyIsImRpZ2l0YWxPbmx5IjpmYWxzZSwidW5wcm90ZWN0ZWREaWdpdGFsT3V0cHV0Ijp0cnVlfX1dfQ.X7kslNaBkbccfGboIDwMJ-ZXpsBUjtpxV6G575D_TkE"
   
+//    UFO Sample sspToken
 //    let sspToken = "eyJraWQiOiI4MTUxOTgiLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJDb250ZW50QXV0aFoiLCJjb250ZW50UmlnaHRzIjpbeyJjb250ZW50SWQiOiJzaW1wbGVobHN0ZXN0MyIsInVzYWdlUnVsZXNQcm9maWxlSWQiOiJUZXN0In1dfQ.XWCLc3pgPpvkA6BDqRJxLK1cmUigd5pHDitybeRdJe8"
-
-    var isPlaying = true
     
   required init?(coder aDecoder: NSCoder) {
     
@@ -99,7 +100,6 @@ class ViewController: UIViewController {
     otvPlayer?.play()
     self.otvPlayer?.isMuted = false
     playerView.player?.isMuted = false
-    isPlaying = true
   }
     
 }
